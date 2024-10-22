@@ -1,3 +1,5 @@
+# BOOK SUGGESTION PLUGIN WITH OLLAMA AND SPRING AI
+
 # Prerequsities
 
 ## Install PostgreSQL
