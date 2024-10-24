@@ -1,13 +1,11 @@
 import pandas as pd
 import psycopg2
-from sentence_transformers import SentenceTransformer
+import json
+import ollama
 
 # Load the CSV file
 csv_file = "dataset.csv"
 df = pd.read_csv(csv_file)
-
-# Initialize a pre-trained embedding model (e.g., all-MiniLM-L6-v2)
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 # Database connection details
 db_config = {
@@ -18,15 +16,33 @@ db_config = {
     "dbname": "postgres"
 }
 
+# Function to generate embeddings using `Ollama` nomic-embed-text
+def generate_embedding(text):
+    try:
+    
+       embedding_json = ollama.embeddings(model='nomic-embed-text', prompt=text)
+       
+       embedding = embedding_json.get('embedding')
+       
+       return embedding if isinstance(embedding, list) else None
+
+    except Exception as e:
+        print(f"Error generating embedding: {e}")
+        return None
+
 # Function to insert data into the book table
 def insert_book_data(row):
     try:
-        # Connect to the YugabyteDB
+        # Connect to the PostgreSQL database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
         
-        # Convert description to embedding
-        description_embedding = model.encode(row['description']).tolist()
+        # Convert description to embedding using `Ollama`
+        description_embedding = generate_embedding(row['description'])
+        
+        if description_embedding is None:
+            print(f"Failed to generate embedding for: {row['title']}")
+            return
         
         # Insert query
         insert_query = """

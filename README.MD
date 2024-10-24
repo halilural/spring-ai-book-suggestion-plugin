@@ -4,21 +4,38 @@
 
 ## Install PostgreSQL
 
+**MacOS/Linux**
+
 ```bash
 brew install postgresql
 ```
 
+**Windows**
+
+[Check out this link](https://community.chocolatey.org/packages/postgresql)
+
+```
+choco install postgresql
+```
+
 ### To start postgresql now and restart at login:
+
+**MacOS/Linux**
 
 ```bash
 brew services start postgresql@14
 ```
 
+**Windows**
+
+It should start automatically.
+
+
 ### To install pgvector extension in PostgreSQL
 
 In this repo https://github.com/pgvector/pgvector you can find other OS.
 
-I'll continue with MacOS.
+**MacOS/Linux**.
 
 ```bash
 cd /tmp
@@ -27,6 +44,29 @@ cd pgvector
 make
 make install # may need sudo
 ```
+
+**Windows**
+
+Ensure C++ support in Visual Studio is installed, and run:
+
+```
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+```
+
+Note: The exact path will vary depending on your Visual Studio version and edition
+
+Then use `nmake` to build:
+
+```
+set "PGROOT=C:\Program Files\PostgreSQL\16"
+cd %TEMP%
+git clone --branch v0.7.4 https://github.com/pgvector/pgvector.git
+cd pgvector
+nmake /F Makefile.win
+nmake /F Makefile.win install
+```
+
+Note: Postgres 17 is not supported yet due to an upstream issue
 
 ### Enable the extension
 
@@ -60,7 +100,7 @@ CREATE TABLE book
     price              REAL,
     currency           TEXT,
     description        TEXT,
-    description_vector VECTOR(384), -- Adjust the dimension based on the embedding model
+    description_vector VECTOR(768), -- Adjust the dimension based on the embedding model
     publisher          TEXT,
     page_count         INT,
     generes            TEXT,
@@ -72,14 +112,25 @@ CREATE TABLE book
 
 ## To set up python virtual environment
 
+**MacOS/Linux**
+
 ```bash
- python3 -m venv path/to/venv
+ python -m venv path/to/venv
  source path/to/venv/bin/activate
 ```
 
+**Windows**
+```
+ python -m venv path/to/venv
+.\path\to\venv\bin\activate
+```
+
+>[!NOTE]
+If `.\path\to\venv\bin\activate` doesn't work, then try ` \path\to\venv\Scripts\activate`.
+
 ### Deactivate virtual environment
 
-```bash
+```
 deactivate
 ```
 
